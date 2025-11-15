@@ -1,13 +1,12 @@
 from sqlalchemy import Column, String, Enum
-from sqlalchemy.ext.declarative import declarative_base
 from enum import Enum as PyEnum
-from .base import BaseModel, Base
+from .base import BaseModel
 
 class UserRole(PyEnum):
     USER = "user"
     ADMIN = "admin"
 
-class User(Base, BaseModel):
+class User(BaseModel):
     __tablename__ = "users"
     
     email = Column(String, unique=True, index=True, nullable=False)

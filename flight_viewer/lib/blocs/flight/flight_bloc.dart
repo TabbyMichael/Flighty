@@ -5,10 +5,13 @@ import 'flight_event.dart';
 import 'flight_state.dart';
 
 class FlightBloc extends Bloc<FlightEvent, FlightState> {
-  final ApiService _apiService = ApiService();
-  final HapticsService _hapticsService = HapticsService();
+  final ApiService _apiService;
+  final HapticsService _hapticsService;
 
-  FlightBloc() : super(FlightInitial()) {
+  FlightBloc({ApiService? apiService, HapticsService? hapticsService})
+    : _apiService = apiService ?? ApiService(),
+      _hapticsService = hapticsService ?? HapticsService(),
+      super(FlightInitial()) {
     on<LoadFlights>(_onLoadFlights);
     on<ApplyFilters>(_onApplyFilters);
     on<SearchFlights>(_onSearchFlights);
