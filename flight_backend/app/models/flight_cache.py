@@ -1,9 +1,7 @@
 from sqlalchemy import Column, String, Numeric, DateTime, JSON
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
-Base = declarative_base()
+from .base import Base
 
 class FlightCache(Base):
     __tablename__ = "flight_cache"

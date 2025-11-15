@@ -1,0 +1,52 @@
+BRANCH NAME:
+feature/rate-limiting-and-caching
+
+FEATURE MESSAGE:
+feat: Implement comprehensive rate limiting and caching for backend API
+
+FEATURE DESCRIPTION:
+This branch introduces robust rate limiting and caching mechanisms to enhance the performance, security, and reliability of the Flight Booking backend API. 
+
+Key improvements include:
+
+1. Rate Limiting Implementation:
+   - Integrated SlowAPI for flexible rate limiting across all API endpoints
+   - Configurable rate limits for different endpoint categories:
+     * Authentication: 10 requests/minute
+     * Flight searches: 30 requests/minute
+     * Bookings: 20 requests/minute
+     * Airport/Airline info: 50 requests/minute
+     * Webhooks: 20 requests/minute
+     * Admin operations: 100 requests/minute
+   - Global rate limit of 100 requests/minute as safety net
+   - Proper HTTP 429 responses with retry-after headers
+   - Configurable rate limiting settings via environment variables
+
+2. Caching System Enhancement:
+   - Implemented Redis-based caching for improved performance
+   - Flight search results caching with parameter-based cache keys
+   - Airport and airline information caching
+   - Automatic cache invalidation for data updates
+   - Configurable cache expiration times
+   - Pattern-based cache invalidation for bulk operations
+
+3. Testing and Quality Assurance:
+   - Comprehensive test suite with 37 tests covering all new functionality
+   - Unit tests for cache operations and rate limit configuration
+   - Integration tests for API endpoint rate limiting and caching
+   - Performance testing to validate improvements
+   - Edge case handling and error condition testing
+
+4. Documentation:
+   - Updated API documentation with rate limit information
+   - Configuration guides for cache settings
+   - Implementation details for future maintenance
+
+These enhancements provide:
+- Protection against API abuse and DDoS attacks
+- Improved response times through intelligent caching
+- Better resource utilization and scalability
+- Enhanced user experience with faster API responses
+- Robust foundation for future feature development
+
+The implementation follows industry best practices and maintains full backward compatibility with existing client applications.
