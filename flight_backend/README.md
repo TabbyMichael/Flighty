@@ -26,7 +26,8 @@ Flutter App  <---->  FastAPI Backend  <---->  PostgreSQL (primary)
 - **Booking Management**: Create and manage flight bookings
 - **User Authentication**: JWT-based authentication
 - **Webhooks**: Subscribe to booking and flight status events
-- **Caching**: Redis caching for improved performance
+- **Enhanced Caching**: Redis caching with configurable TTL for different data types
+- **Rate Limiting**: API rate limiting to prevent abuse and ensure fair usage
 - **Background Tasks**: Celery for async processing and cron jobs
 - **Analytics**: Structured logging and metrics
 - **Security**: JWT auth, rate limiting, input sanitization
@@ -64,6 +65,30 @@ Flutter App  <---->  FastAPI Backend  <---->  PostgreSQL (primary)
    ```bash
    uvicorn app.main:app --reload
    ```
+
+## Rate Limiting
+
+API endpoints are protected by rate limiting to prevent abuse and ensure fair usage. Rate limits vary by endpoint type:
+
+- **Authentication endpoints**: 5-20 requests/minute
+- **Flight search endpoints**: 5-30 requests/minute
+- **Booking endpoints**: 5-20 requests/minute
+- **Reference data (airports/airlines)**: 20-50 requests/minute
+- **Webhook endpoints**: 5-20 requests/minute
+- **Admin endpoints**: 30-100 requests/minute
+
+Rate limits are configurable in `app/core/rate_limit_config.py`.
+
+## Caching
+
+The application uses Redis for caching to improve performance and reduce external API calls:
+
+- **Flight search results**: Cached for 10 minutes
+- **Airport and airline information**: Cached for 24 hours
+- **Live flight data**: Cached for 15-60 seconds
+- **Tracking information**: Short TTL for real-time data
+
+Cache TTL values are configurable in the caching functions.
 
 ## API Endpoints
 

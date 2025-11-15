@@ -38,25 +38,25 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Bookings'),
-        actions: [
-          BlocBuilder<ThemeBloc, ThemeState>(
-            builder: (context, themeState) {
-              if (themeState is ThemeLoaded) {
-                return IconButton(
-                  icon: Icon(
-                    themeState.themeMode == ThemeMode.dark
-                        ? Icons.light_mode
-                        : Icons.dark_mode,
-                  ),
-                  onPressed: () {
-                    context.read<ThemeBloc>().add(ToggleTheme());
-                  },
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ],
+        // actions: [
+        //   BlocBuilder<ThemeBloc, ThemeState>(
+        //     builder: (context, themeState) {
+        //       if (themeState is ThemeLoaded) {
+        //         return IconButton(
+        //           icon: Icon(
+        //             themeState.themeMode == ThemeMode.dark
+        //                 ? Icons.light_mode
+        //                 : Icons.dark_mode,
+        //           ),
+        //           onPressed: () {
+        //             context.read<ThemeBloc>().add(ToggleTheme());
+        //           },
+        //         );
+        //       }
+        //       return const SizedBox.shrink();
+        //     },
+        //   ),
+        // ],
       ),
       body: BlocBuilder<BookingBloc, BookingState>(
         builder: (context, bookingState) {

@@ -1,12 +1,22 @@
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends, Request
 from app.schemas.flight import FlightSearch, FlightListResponse, FlightResponse
 from app.core.aviationstack_client import search_aviationstack
+from app.core.cache import get_cached_flight_search, cache_flight_search
+from app.core.rate_limiter import limiter
+from app.core.rate_limit_config import (
+    FLIGHTS_RATE_LIMIT,
+    FLIGHTS_SEARCH_RATE_LIMIT,
+    FLIGHTS_LIVE_RATE_LIMIT,
+    FLIGHTS_TRACK_RATE_LIMIT,
+    FLIGHTS_DETAIL_RATE_LIMIT
+)
 from typing import List
 
 router = APIRouter()
 
 @router.get("/", response_model=FlightListResponse)
-def list_flights():
+@limiter.limit(FLIGHTS_RATE_LIMIT)
+def list_flights(request: Request):
     """
     List all available flights (returns empty list in this mock implementation).
     In a real implementation, this would return cached or live flight data.
@@ -14,7 +24,9 @@ def list_flights():
     return FlightListResponse(flights=[])
 
 @router.get("/search")
+@limiter.limit(FLIGHTS_SEARCH_RATE_LIMIT)
 def search_flights(
+    request: Request,
     origin: str = Query(..., description="Origin airport code"),
     destination: str = Query(..., description="Destination airport code"),
     date: str = Query(..., description="Departure date (YYYY-MM-DD)"),
@@ -30,6 +42,11 @@ def search_flights(
         "flight_date": date,
         "limit": 100
     }
+    
+    # Check cache first
+    cached_data = get_cached_flight_search(params)
+    if cached_data:
+        return cached_data
     
     # Search using AviationStack client
     data = search_aviationstack(params)
@@ -53,10 +70,16 @@ def search_flights(
             }
             flights.append(flight)
     
-    return {"flights": flights}
+    result = {"flights": flights}
+    
+    # Cache the results
+    cache_flight_search(params, result, ttl=600)  # Cache for 10 minutes
+    
+    return result
 
 @router.get("/{flight_id}")
-def get_flight(flight_id: str):
+@limiter.limit(FLIGHTS_DETAIL_RATE_LIMIT)
+def get_flight(flight_id: str, request: Request):
     """
     Get detailed information for a specific flight.
     """
@@ -64,7 +87,8 @@ def get_flight(flight_id: str):
     return {"flight_id": flight_id, "details": "Flight details would go here"}
 
 @router.get("/live")
-def get_live_flights():
+@limiter.limit(FLIGHTS_LIVE_RATE_LIMIT)
+def get_live_flights(request: Request):
     """
     Get live flight data (proxies OpenSky).
     """
@@ -72,7 +96,8 @@ def get_live_flights():
     return {"message": "Live flight data would go here"}
 
 @router.get("/track/{identifier}")
-def track_flight(identifier: str):
+@limiter.limit(FLIGHTS_TRACK_RATE_LIMIT)
+def track_flight(identifier: str, request: Request):
     """
     Start/return tracking info for a specific flight.
     """

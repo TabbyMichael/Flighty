@@ -1,10 +1,19 @@
-from fastapi import APIRouter, Query, Depends
-from app.schemas.booking import BookingCreate, BookingResponse, BookingListResponse
+from fastapi import APIRouter, Query, Depends, Request
+from app.schemas.booking import BookingCreate, BookingResponse, BookingListResponse, PassengerInfo
+from app.core.rate_limiter import limiter
+from app.core.rate_limit_config import (
+    BOOKINGS_RATE_LIMIT,
+    BOOKINGS_CREATE_RATE_LIMIT,
+    BOOKINGS_LIST_RATE_LIMIT,
+    BOOKINGS_DETAIL_RATE_LIMIT
+)
+from datetime import datetime
 
 router = APIRouter()
 
 @router.post("/", response_model=BookingResponse)
-def create_booking(booking: BookingCreate):
+@limiter.limit(BOOKINGS_CREATE_RATE_LIMIT)
+def create_booking(request: Request, booking: BookingCreate):
     """
     Create a new booking.
     """
@@ -24,11 +33,12 @@ def create_booking(booking: BookingCreate):
         total_price=booking.total_price,
         currency=booking.currency,
         status="confirmed",
-        created_at="2023-01-01T00:00:00Z"
+        created_at=datetime(2023, 1, 1)
     )
 
 @router.get("/", response_model=BookingListResponse)
-def list_bookings(email: str = Query(..., description="User email")):
+@limiter.limit(BOOKINGS_LIST_RATE_LIMIT)
+def list_bookings(request: Request, email: str = Query(..., description="User email")):
     """
     List bookings for a specific user.
     """
@@ -36,7 +46,8 @@ def list_bookings(email: str = Query(..., description="User email")):
     return BookingListResponse(bookings=[])
 
 @router.get("/{pnr}", response_model=BookingResponse)
-def get_booking(pnr: str):
+@limiter.limit(BOOKINGS_DETAIL_RATE_LIMIT)
+def get_booking(pnr: str, request: Request):
     """
     Get details for a specific booking.
     """
@@ -45,15 +56,15 @@ def get_booking(pnr: str):
         id="booking_id",
         pnr=pnr,
         flight_id="flight_id",
-        passenger={
-            "first_name": "John",
-            "last_name": "Doe",
-            "passport": "P12345678",
-            "email": "john@example.com"
-        },
+        passenger=PassengerInfo(
+            first_name="John",
+            last_name="Doe",
+            passport="P12345678",
+            email="john@example.com"
+        ),
         extras={},
         total_price=500.0,
         currency="USD",
         status="confirmed",
-        created_at="2023-01-01T00:00:00Z"
+        created_at=datetime(2023, 1, 1)
     )

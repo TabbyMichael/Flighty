@@ -1,0 +1,34 @@
+# Rate limiting configuration
+
+# Global rate limits
+GLOBAL_RATE_LIMIT = "100/minute"
+
+# API-specific rate limits
+AUTH_RATE_LIMIT = "10/minute"
+FLIGHTS_RATE_LIMIT = "30/minute"
+BOOKINGS_RATE_LIMIT = "20/minute"
+AIRPORTS_RATE_LIMIT = "50/minute"
+AIRLINES_RATE_LIMIT = "50/minute"
+WEBHOOKS_RATE_LIMIT = "20/minute"
+ADMIN_RATE_LIMIT = "100/minute"
+
+# Per-endpoint rate limits
+FLIGHTS_SEARCH_RATE_LIMIT = "10/minute"
+FLIGHTS_LIVE_RATE_LIMIT = "5/minute"
+FLIGHTS_TRACK_RATE_LIMIT = "15/minute"
+FLIGHTS_DETAIL_RATE_LIMIT = "20/minute"
+
+BOOKINGS_CREATE_RATE_LIMIT = "5/minute"
+BOOKINGS_LIST_RATE_LIMIT = "10/minute"
+BOOKINGS_DETAIL_RATE_LIMIT = "20/minute"
+
+AUTH_SIGNUP_RATE_LIMIT = "5/minute"
+AUTH_LOGIN_RATE_LIMIT = "10/minute"
+AUTH_REFRESH_RATE_LIMIT = "20/minute"
+
+WEBHOOKS_CREATE_RATE_LIMIT = "5/minute"
+WEBHOOKS_LIST_RATE_LIMIT = "10/minute"
+WEBHOOKS_TEST_RATE_LIMIT = "5/minute"
+
+ADMIN_METRICS_RATE_LIMIT = "30/minute"
+ADMIN_HEALTH_RATE_LIMIT = "60/minute"
