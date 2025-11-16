@@ -36,6 +36,8 @@ def search_flights(
     Search for flights between origin and destination on a specific date.
     Returns cached or live results from AviationStack.
     """
+    print(f"Search flights called with origin={origin}, destination={destination}, date={date}")
+    
     params = {
         "dep_iata": origin,
         "arr_iata": destination,
@@ -46,10 +48,13 @@ def search_flights(
     # Check cache first
     cached_data = get_cached_flight_search(params)
     if cached_data:
+        print("Returning cached data")
         return cached_data
     
     # Search using AviationStack client
+    print("Calling search_aviationstack")
     data = search_aviationstack(params)
+    print(f"AviationStack returned data with {len(data.get('data', []))} flights")
     
     # Process and return results
     flights = []
@@ -71,6 +76,7 @@ def search_flights(
             flights.append(flight)
     
     result = {"flights": flights}
+    print(f"Returning {len(flights)} flights")
     
     # Cache the results
     cache_flight_search(params, result, ttl=600)  # Cache for 10 minutes
