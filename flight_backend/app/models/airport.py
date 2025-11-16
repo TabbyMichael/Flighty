@@ -1,14 +1,12 @@
 from sqlalchemy import Column, String, Numeric, JSON
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import UUID
+from .base import Base, BaseModel
 import uuid
 
-Base = declarative_base()
-
-class Airport(Base):
+class Airport(Base, BaseModel):
     __tablename__ = "airports"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     iata = Column(String, index=True)
     icao = Column(String)
     name = Column(String)

@@ -1,13 +1,11 @@
 from sqlalchemy import Column, String, JSON, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import UUID
+from .base import Base, BaseModel
 import uuid
 
-Base = declarative_base()
-
-class AnalyticsEvent(Base):
+class AnalyticsEvent(Base, BaseModel):
     __tablename__ = "analytics_events"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     event_type = Column(String)
     payload = Column(JSON)

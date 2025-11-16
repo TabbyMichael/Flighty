@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/flight.dart';
-import '../models/booking.dart';
+
 import '../blocs/extra_service/extra_service_bloc.dart';
 import '../blocs/extra_service/extra_service_event.dart';
 import '../blocs/extra_service/extra_service_state.dart';
@@ -13,8 +13,8 @@ import '../blocs/theme/theme_event.dart';
 import '../blocs/theme/theme_state.dart';
 import '../widgets/custom_loader.dart';
 import '../services/haptics_service.dart';
-import 'receipt_screen.dart';
-import '../models/receipt.dart';
+
+
 
 class ReviewPayScreen extends StatelessWidget {
   final Flight flight;

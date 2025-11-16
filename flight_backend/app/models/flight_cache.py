@@ -1,12 +1,12 @@
 from sqlalchemy import Column, String, Numeric, DateTime, JSON
 from sqlalchemy.dialects.postgresql import UUID
+from .base import Base, BaseModel
 import uuid
-from .base import Base
 
-class FlightCache(Base):
+class FlightCache(Base, BaseModel):
     __tablename__ = "flight_cache"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     flight_number = Column(String)
     dep_iata = Column(String)
     arr_iata = Column(String)

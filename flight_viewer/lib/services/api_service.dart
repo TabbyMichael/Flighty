@@ -1,17 +1,31 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import '../models/flight.dart';
 import '../models/airline.dart';
 import '../models/extra_service.dart';
 import '../models/booking.dart';
+import '../models/user.dart';
 import 'haptics_service.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000'; // For iOS simulator and local development
-  // static const String baseUrl = 'http://10.0.2.2:8000'; // For Android emulator
-  // static const String baseUrl = 'http://YOUR_COMPUTER_IP:8000'; // For physical device
+  static final String baseUrl = _resolveBaseUrl();
   
   final HapticsService _hapticsService = HapticsService();
+
+  static String _resolveBaseUrl() {
+    const envOverride = String.fromEnvironment('API_BASE_URL');
+    if (envOverride.isNotEmpty) {
+      return envOverride;
+    }
+
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:8000';
+    }
+
+    // iOS simulator and desktop platforms can talk to localhost directly.
+    return 'http://127.0.0.1:8000';
+  }
 
   Future<List<Flight>> fetchFlights() async {
     try {
@@ -209,6 +223,60 @@ class ApiService {
     } catch (e) {
       _hapticsService.error();
       throw Exception('Failed to fetch bookings: $e');
+    }
+  }
+  
+  // Auth methods
+  Future<AuthResponse> login(String email, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'username': email,
+          'password': password,
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        _hapticsService.success();
+        return AuthResponse.fromJson(data);
+      } else {
+        _hapticsService.error();
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['detail'] ?? 'Login failed');
+      }
+    } catch (e) {
+      _hapticsService.error();
+      throw Exception('Failed to login: $e');
+    }
+  }
+  
+  Future<AuthResponse> signup(String email, String password, String? fullName) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'password': password,
+          'full_name': fullName,
+        }),
+      );
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        _hapticsService.success();
+        return AuthResponse.fromJson(data);
+      } else {
+        _hapticsService.error();
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['detail'] ?? 'Signup failed');
+      }
+    } catch (e) {
+      _hapticsService.error();
+      throw Exception('Failed to signup: $e');
     }
   }
 }

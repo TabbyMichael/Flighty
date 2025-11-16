@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'search_form_screen.dart';
 import 'my_bookings_screen.dart';
+import 'profile_screen.dart';
 import '../blocs/theme/theme_bloc.dart';
 import '../blocs/theme/theme_state.dart';
 import '../blocs/theme/theme_event.dart';
@@ -12,7 +13,7 @@ class MainTabScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           toolbarHeight: 150,
@@ -49,7 +50,7 @@ class MainTabScreen extends StatelessWidget {
           bottom: TabBar(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             labelColor: Theme.of(context).colorScheme.primary,
-            unselectedLabelColor: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.5) ?? Colors.grey,
+            unselectedLabelColor: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.5) ?? Colors.grey,
             indicatorColor: Theme.of(context).colorScheme.primary,
             indicatorWeight: 3.0,
             indicatorSize: TabBarIndicatorSize.tab,
@@ -65,6 +66,7 @@ class MainTabScreen extends StatelessWidget {
             tabs: const [
               Tab(text: 'Search Flights'),
               Tab(text: 'My Bookings'),
+              Tab(text: 'Profile'),
             ],
           ),
         ),
@@ -72,6 +74,7 @@ class MainTabScreen extends StatelessWidget {
           children: [
             SearchFormScreen(),
             MyBookingsScreen(),
+            ProfileScreen(),
           ],
         ),
       ),

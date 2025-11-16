@@ -4,9 +4,7 @@ import '../models/booking.dart';
 import '../blocs/booking/booking_bloc.dart';
 import '../blocs/booking/booking_state.dart';
 import '../blocs/booking/booking_event.dart';
-import '../blocs/theme/theme_bloc.dart';
-import '../blocs/theme/theme_state.dart';
-import '../blocs/theme/theme_event.dart';
+
 import '../widgets/custom_loader.dart';
 
 class MyBookingsScreen extends StatefulWidget {
