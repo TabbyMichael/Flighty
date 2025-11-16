@@ -63,7 +63,7 @@ class FlightDetailScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: Theme.of(context).dividerColor.withOpacity(0.1),
+                          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
@@ -71,7 +71,7 @@ class FlightDetailScreen extends StatelessWidget {
                     child: TabBar(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       labelColor: Theme.of(context).colorScheme.primary,
-                      unselectedLabelColor: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.5) ?? Colors.grey,
+                      unselectedLabelColor: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.5) ?? Colors.grey,
                       indicatorColor: Theme.of(context).colorScheme.primary,
                       indicatorWeight: 3.0,
                       indicatorSize: TabBarIndicatorSize.tab,
@@ -129,7 +129,7 @@ class FlightDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.05),
+        color: theme.colorScheme.primary.withValues(alpha: 0.05),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
@@ -165,7 +165,7 @@ class FlightDetailScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E88E5).withOpacity(0.1),
+                  color: const Color(0xFF1E88E5).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -316,7 +316,7 @@ class FlightDetailScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: theme.dividerColor.withOpacity(0.2),
+          color: theme.dividerColor.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -353,7 +353,7 @@ class FlightDetailScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.2),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -384,7 +384,7 @@ class FlightDetailScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.2),
+        color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -569,7 +569,7 @@ class FlightDetailScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: Theme.of(context).dividerColor.withOpacity(0.2),
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -621,7 +621,7 @@ class FlightDetailScreen extends StatelessWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E88E5).withOpacity(0.1),
+                    color: const Color(0xFF1E88E5).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.add, size: 16, color: Color(0xFF1E88E5)),
@@ -641,7 +641,7 @@ class FlightDetailScreen extends StatelessWidget {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/flight.dart';
 import 'review_pay_screen.dart';
 import '../utils/navigation_utils.dart';
-import '../widgets/custom_loader.dart';
+
 import '../blocs/theme/theme_bloc.dart';
 import '../blocs/theme/theme_state.dart';
 import '../blocs/theme/theme_event.dart';

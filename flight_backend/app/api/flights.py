@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Query, Depends, Request
-from app.schemas.flight import FlightSearch, FlightListResponse, FlightResponse
-from app.core.aviationstack_client import search_aviationstack
-from app.core.cache import get_cached_flight_search, cache_flight_search
-from app.core.rate_limiter import limiter
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from datetime import datetime
+import random
+
+from app.database.database import get_db
+from app.schemas.flight import FlightResponse, FlightListResponse, FlightSearch
 from app.core.rate_limit_config import (
     FLIGHTS_RATE_LIMIT,
     FLIGHTS_SEARCH_RATE_LIMIT,
@@ -10,102 +13,117 @@ from app.core.rate_limit_config import (
     FLIGHTS_TRACK_RATE_LIMIT,
     FLIGHTS_DETAIL_RATE_LIMIT
 )
-from typing import List
+from app.core.rate_limiter import limiter
 
 router = APIRouter()
 
-@router.get("/", response_model=FlightListResponse)
-@limiter.limit(FLIGHTS_RATE_LIMIT)
-def list_flights(request: Request):
-    """
-    List all available flights (returns empty list in this mock implementation).
-    In a real implementation, this would return cached or live flight data.
-    """
-    return FlightListResponse(flights=[])
+# Mock flight data for demonstration
+MOCK_FLIGHTS = [
+    {
+        "id": "FL001",
+        "flight_number": "AA101",
+        "airline": "American Airlines",
+        "departure_airport": "JFK",
+        "arrival_airport": "LAX",
+        "departure_time": "2023-06-15T08:00:00",
+        "arrival_time": "2023-06-15T11:30:00",
+        "duration": 330,
+        "price": 299.99,
+        "currency": "USD",
+        "stops": 0
+    },
+    {
+        "id": "FL002",
+        "flight_number": "DL202",
+        "airline": "Delta Airlines",
+        "departure_airport": "JFK",
+        "arrival_airport": "LAX",
+        "departure_time": "2023-06-15T14:00:00",
+        "arrival_time": "2023-06-15T17:45:00",
+        "duration": 345,
+        "price": 349.99,
+        "currency": "USD",
+        "stops": 0
+    },
+    {
+        "id": "FL003",
+        "flight_number": "UA303",
+        "airline": "United Airlines",
+        "departure_airport": "JFK",
+        "arrival_airport": "LAX",
+        "departure_time": "2023-06-15T20:00:00",
+        "arrival_time": "2023-06-15T23:30:00",
+        "duration": 330,
+        "price": 279.99,
+        "currency": "USD",
+        "stops": 0
+    }
+]
 
-@router.get("/search")
+@router.get("/search", response_model=FlightListResponse)
 @limiter.limit(FLIGHTS_SEARCH_RATE_LIMIT)
 def search_flights(
     request: Request,
     origin: str = Query(..., description="Origin airport code"),
     destination: str = Query(..., description="Destination airport code"),
-    date: str = Query(..., description="Departure date (YYYY-MM-DD)"),
-    passengers: int = Query(1, description="Number of passengers")
+    date: str = Query(..., description="Flight date (YYYY-MM-DD)"),
+    db: Session = Depends(get_db)
 ):
-    """
-    Search for flights between origin and destination on a specific date.
-    Returns cached or live results from AviationStack.
-    """
-    print(f"Search flights called with origin={origin}, destination={destination}, date={date}")
+    """Search for flights between origin and destination on a specific date."""
+    # In a real implementation, this would query a flight database or external API
+    # For now, we'll return mock data
+    filtered_flights = [flight for flight in MOCK_FLIGHTS 
+                       if flight["departure_airport"] == origin 
+                       and flight["arrival_airport"] == destination]
     
-    params = {
-        "dep_iata": origin,
-        "arr_iata": destination,
-        "flight_date": date,
-        "limit": 100
-    }
-    
-    # Check cache first
-    cached_data = get_cached_flight_search(params)
-    if cached_data:
-        print("Returning cached data")
-        return cached_data
-    
-    # Search using AviationStack client
-    print("Calling search_aviationstack")
-    data = search_aviationstack(params)
-    print(f"AviationStack returned data with {len(data.get('data', []))} flights")
-    
-    # Process and return results
-    flights = []
-    if "data" in data:
-        for flight_data in data["data"]:
-            flight = {
-                "id": flight_data.get("flight", {}).get("iata", ""),
-                "flight_number": flight_data.get("flight", {}).get("number", ""),
-                "airline": flight_data.get("airline", {}).get("name", ""),
-                "departure_airport": flight_data.get("departure", {}).get("iata", ""),
-                "arrival_airport": flight_data.get("arrival", {}).get("iata", ""),
-                "departure_time": flight_data.get("departure", {}).get("scheduled", ""),
-                "arrival_time": flight_data.get("arrival", {}).get("scheduled", ""),
-                "duration": flight_data.get("flight_duration", 0),
-                "price": 0,  # Price would come from a different source
-                "currency": "USD",
-                "stops": 0   # Would need to calculate based on segments
-            }
-            flights.append(flight)
-    
-    result = {"flights": flights}
-    print(f"Returning {len(flights)} flights")
-    
-    # Cache the results
-    cache_flight_search(params, result, ttl=600)  # Cache for 10 minutes
-    
-    return result
+    return {"flights": filtered_flights}
 
-@router.get("/{flight_id}")
+@router.get("/{flight_id}", response_model=FlightResponse)
 @limiter.limit(FLIGHTS_DETAIL_RATE_LIMIT)
-def get_flight(flight_id: str, request: Request):
-    """
-    Get detailed information for a specific flight.
-    """
-    # In a real implementation, this would fetch from cache or external API
-    return {"flight_id": flight_id, "details": "Flight details would go here"}
+def get_flight(
+    request: Request,
+    flight_id: str,
+    db: Session = Depends(get_db)
+):
+    """Get details for a specific flight."""
+    # In a real implementation, this would query the database
+    # For now, we'll search in our mock data
+    for flight in MOCK_FLIGHTS:
+        if flight["id"] == flight_id:
+            return flight
+    
+    raise HTTPException(status_code=404, detail="Flight not found")
 
 @router.get("/live")
 @limiter.limit(FLIGHTS_LIVE_RATE_LIMIT)
 def get_live_flights(request: Request):
-    """
-    Get live flight data (proxies OpenSky).
-    """
-    # In a real implementation, this would fetch from OpenSky
-    return {"message": "Live flight data would go here"}
+    """Get live flight data."""
+    # In a real implementation, this would connect to a live flight data API
+    # For now, we'll return mock data with random statuses
+    live_flights = []
+    for flight in MOCK_FLIGHTS[:2]:  # Return first 2 flights
+        live_flight = flight.copy()
+        live_flight["status"] = random.choice(["On Time", "Delayed", "Boarding"])
+        live_flights.append(live_flight)
+    
+    return {"flights": live_flights}
 
 @router.get("/track/{identifier}")
 @limiter.limit(FLIGHTS_TRACK_RATE_LIMIT)
-def track_flight(identifier: str, request: Request):
-    """
-    Start/return tracking info for a specific flight.
-    """
-    # In a real implementation, this would start tracking via OpenSky
-    return {"identifier": identifier, "tracking": "Tracking info would go here"}
+def track_flight(request: Request, identifier: str):
+    """Track a specific flight by identifier."""
+    # In a real implementation, this would connect to a flight tracking API
+    # For now, we'll return mock data
+    for flight in MOCK_FLIGHTS:
+        if flight["id"] == identifier or flight["flight_number"] == identifier:
+            return {
+                "flight": flight,
+                "tracking_info": {
+                    "status": "In Flight",
+                    "altitude": f"{random.randint(30000, 40000)} ft",
+                    "speed": f"{random.randint(500, 600)} mph",
+                    "location": "Over Kansas"
+                }
+            }
+    
+    raise HTTPException(status_code=404, detail="Flight not found")
